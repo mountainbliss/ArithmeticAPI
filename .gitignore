@@ -1,0 +1,29 @@
+# Build outputs
+bin/
+obj/
+out/
+
+# User-specific Visual Studio files
+*.user
+*.suo
+.vs/
+
+# Rider / JetBrains
+.idea/
+*.DotSettings.user
+
+# VS Code
+.vscode/
+
+# NuGet
+*.nupkg
+packages/
+
+# Test results
+TestResults/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
