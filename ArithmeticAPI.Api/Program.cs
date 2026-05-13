@@ -1,4 +1,4 @@
-using ArithmeticAPI.Api.Services;
+using ArithmeticAPI.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 

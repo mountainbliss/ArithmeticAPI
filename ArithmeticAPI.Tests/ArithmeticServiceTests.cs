@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using System;
-using ArithmeticAPI.Api.Services;
+using ArithmeticAPI.Core;
 
 namespace ArithmeticAPI.Tests
 {

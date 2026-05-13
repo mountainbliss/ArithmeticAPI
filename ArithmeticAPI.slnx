@@ -1,4 +1,6 @@
 <Solution>
   <Project Path="ArithmeticAPI.Api/ArithmeticAPI.Api.csproj" />
+  <Project Path="ArithmeticAPI.Core/ArithmeticAPI.Core.csproj" />
+  <Project Path="ArithmeticAPI.Data/ArithmeticAPI.Data.csproj" />
   <Project Path="ArithmeticAPI.Tests/ArithmeticAPI.Tests.csproj" />
 </Solution>

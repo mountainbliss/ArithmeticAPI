@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using ArithmeticAPI.Api.Services;
-using ArithmeticAPI.Api.Models;
+using ArithmeticAPI.Core;
 
 namespace ArithmeticAPI.Api.Controllers
 {

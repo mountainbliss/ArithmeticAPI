@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ArithmeticAPI.Api\ArithmeticAPI.Api.csproj" />
+    <ProjectReference Include="..\ArithmeticAPI.Core\ArithmeticAPI.Core.csproj" />
   </ItemGroup>
 
 </Project>

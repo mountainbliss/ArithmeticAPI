@@ -1,6 +1,6 @@
 
 
-namespace ArithmeticAPI.Api.Services;
+namespace ArithmeticAPI.Core;
 
 public class ArithmeticService
 {
