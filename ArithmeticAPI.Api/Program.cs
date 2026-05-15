@@ -1,25 +1,34 @@
 using ArithmeticAPI.Core;
+using ArithmeticAPI.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Register our ArithmeticService with the DI container
+// ── Register services ────────────────────────────────────────────────────────
+builder.Services.AddSingleton<CalculationHistoryService>();
 builder.Services.AddScoped<ArithmeticService>();
-
-// Add controller support
 builder.Services.AddControllers();
-
-// Add OpenAPI support (built into .NET 10)
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Enable OpenAPI in development mode
+// ── Middleware pipeline ──────────────────────────────────────────────────────
+// Order matters!
+
+// 1. Our custom logging + error handling middleware
+// Registered first so it wraps everything below
+app.UseMiddleware<RequestLoggingMiddleware>();
+
+// 2. Built-in middleware
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();  // only redirect in production
+}
+
 app.UseAuthorization();
 app.MapControllers();
 
