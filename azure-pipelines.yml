@@ -1,0 +1,86 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  solution: '**/*.sln'
+  azureSubscription: 'ArithmeticAPI-Azure'
+  appServiceName: 'arithmeticapi-dev-f3fmdbetb2b2hpe9'
+
+stages:
+  - stage: CI
+    displayName: 'Build and Test'
+    jobs:
+      - job: Build
+        displayName: 'Build and Test'
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Use .NET 10 SDK'
+            inputs:
+              packageType: 'sdk'
+              version: '10.x'
+
+          - script: dotnet restore $(solution)
+            displayName: 'Restore NuGet packages'
+
+          - script: dotnet build $(solution) --configuration $(buildConfiguration) --no-restore
+            displayName: 'Build solution'
+
+          - script: |
+              dotnet test $(solution) \
+                --configuration $(buildConfiguration) \
+                --no-build \
+                --logger trx \
+                --results-directory $(System.DefaultWorkingDirectory)/TestResults
+            displayName: 'Run NUnit tests'
+
+          - task: PublishTestResults@2
+            displayName: 'Publish test results'
+            inputs:
+              testResultsFormat: 'VSTest'
+              testResultsFiles: '**/TestResults/*.trx'
+              failTaskOnFailedTests: true
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Publish API'
+            inputs:
+              command: 'publish'
+              publishWebProjects: true
+              arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Upload build artifact'
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'drop'
+              publishLocation: 'Container'
+
+  - stage: CD
+    displayName: 'Deploy to Azure'
+    dependsOn: CI
+    condition: succeeded()
+    jobs:
+      - deployment: DeployWeb
+        displayName: 'Deploy to App Service'
+        environment: 'production'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureWebApp@1
+                  displayName: 'Deploy to Azure App Service'
+                  inputs:
+                    azureSubscription: '$(azureSubscription)'
+                    appType: 'webAppLinux'
+                    appName: '$(appServiceName)'
+                    package: '$(Pipeline.Workspace)/drop/**/*.zip'
