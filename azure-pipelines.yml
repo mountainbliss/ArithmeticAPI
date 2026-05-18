@@ -13,7 +13,7 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  solution: '**/*.sln'
+  solution: 'ArithmeticAPI.slnx'
   azureSubscription: 'ArithmeticAPI-Azure'
   appServiceName: 'arithmeticapi-dev-f3fmdbetb2b2hpe9'
 
