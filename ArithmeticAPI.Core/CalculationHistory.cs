@@ -8,4 +8,5 @@ public class CalculationHistory
     public string Operation { get; set; } = string.Empty;
     public double Result { get; set; }
     public DateTime CreatedAt { get; set; }
+    public DateTime GeneratedAt { get; set; } = DateTime.UtcNow; 
 }

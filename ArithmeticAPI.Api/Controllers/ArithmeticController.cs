@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using ArithmeticAPI.Core;
+using ArithmeticAPI.Api.Filters;
 
 namespace ArithmeticAPI.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[ServiceFilter(typeof(AuditLogFilter))]
 public class ArithmeticController : ControllerBase
 {
     private readonly ArithmeticService _arithmeticService;
@@ -77,6 +79,8 @@ public class ArithmeticController : ControllerBase
 
     // GET /api/arithmetic/history
     [HttpGet("history")]
+    //[TypeFilter(typeof(ResponseCacheFilter), Arguments = new object[] { 60 })]
+    [ResponseCache(Duration = 60)]
     public ActionResult<IEnumerable<CalculationResult>> GetHistory()
     {
         return Ok(_historyService.GetAll());
@@ -94,5 +98,28 @@ public class ArithmeticController : ControllerBase
     public ActionResult<IEnumerable<CalculationResult>> GetByOperation([FromQuery] string operation)
     {
         return Ok(_historyService.GetByOperation(operation));
+    }
+
+    // POST /api/arithmetic/calculate
+    // Body: { "operation": "add", "operand1": 10, "operand2": 5 }
+    [HttpPost("calculate")]
+    public ActionResult<CalculationResult> Calculate([FromBody] CalculationRequest request)
+    {
+        var result = request.Operation switch
+        {
+            "add"      => _arithmeticService.Add(request.Operand1, request.Operand2),
+            "subtract" => _arithmeticService.Subtract(request.Operand1, request.Operand2),
+            "multiply" => _arithmeticService.Multiply(request.Operand1, request.Operand2),
+            "divide"   => _arithmeticService.Divide(request.Operand1, request.Operand2),
+            _          => throw new ArgumentException($"Unknown operation: {request.Operation}")
+        };
+
+        return Ok(new CalculationResult
+        {
+            Operand1  = request.Operand1,
+            Operand2  = request.Operand2,
+            Operation = request.Operation,
+            Result    = result
+        });
     }
 }
